@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>🔐 Premium Login — Admin (GitHub Sync)</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#2575fc;--secondary:#6a11cb;--neon:#00f0ff;--glass:rgba(18,18,22,0.66);--border:rgba(255,255,255,0.08);--ripple:rgba(0,240,255,0.12);--muted:#9fb0c8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;width:100%}
+body{font-family:"Poppins",sans-serif;background:radial-gradient(circle at 20% 20%, #0f0f15 0%, #050507 60%);background-size:400% 400%;animation:bgMove 14s ease infinite;color:#e9eef8;display:flex;align-items:center;justify-content:center;padding:14px}
+@keyframes bgMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.app{width:100%;max-width:420px;height:92vh;border-radius:18px;overflow:hidden;display:flex;flex-direction:column;background:linear-gradient(180deg, rgba(6,6,8,0.6), rgba(3,3,4,0.95));box-shadow:0 20px 60px rgba(0,0,0,0.6);position:relative}
+.header{height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--border);background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.008));z-index:20}
+.brand{color:var(--neon);font-weight:700;letter-spacing:0.4px;text-shadow:0 0 12px rgba(106,17,203,0.14)}
+.right{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted)}
+.menu-btn{width:44px;height:40px;border-radius:10px;border:1px solid rgba(255,255,255,0.03);background:linear-gradient(180deg, rgba(10,10,12,0.5), rgba(8,8,10,0.6));color:var(--neon);cursor:pointer;display:none;align-items:center;justify-content:center;position:relative;overflow:hidden;transform-origin:center;transition:transform .28s,box-shadow .28s,opacity .28s}
+.menu-btn.show{display:flex;animation:menuPop .35s cubic-bezier(.2,.9,.3,1)}
+@keyframes menuPop{0{transform:scale(.6);opacity:0}60%{transform:scale(1.08)}100{transform:scale(1);opacity:1}}
+.menu-icon{width:18px;height:2px;background:var(--neon);position:relative;display:block;border-radius:2px}
+.menu-icon::before,.menu-icon::after{content:"";position:absolute;left:0;right:0;height:2px;background:var(--neon);border-radius:2px}
+.menu-icon::before{top:-6px}.menu-icon::after{top:6px}
+.menu-btn.open .menu-icon{background:transparent}
+.menu-btn.open .menu-icon::before{transform:rotate(45deg);top:0}
+.menu-btn.open .menu-icon::after{transform:rotate(-45deg);top:0}
+.menu-overlay{position:fixed;inset:0;background:rgba(2,8,12,0.6);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity .28s;z-index:45}
+.menu-overlay.visible{opacity:1;pointer-events:auto}
+.menu-dropdown{position:absolute;right:12px;top:56px;background:rgba(8,8,10,0.98);border-radius:12px;padding:8px;border:1px solid var(--border);box-shadow:0 18px 50px rgba(0,0,0,0.6);z-index:60;min-width:220px;transform-origin:top right;transform:translateY(-8px) scale(.98);opacity:0;pointer-events:none;transition:transform .28s,opacity .22s}
+.menu-dropdown.open{transform:translateY(0) scale(1);opacity:1;pointer-events:auto}
+.menu-dropdown button{width:100%;background:transparent;border:none;color:#dff3ff;padding:12px 14px;text-align:left;cursor:pointer;border-radius:8px;font-weight:600}
+.menu-dropdown button .sub{display:block;font-size:12px;color:#9fb0c8;margin-top:6px;font-weight:400}
+.menu-dropdown button:hover{background:rgba(0,240,255,0.03);color:#fff;transform:translateX(6px);transition:transform .18s}
+.body{flex:1;overflow:auto;padding:18px;display:flex;align-items:center;justify-content:center}
+.login-card{width:100%;max-width:360px;margin:8px auto;background:var(--glass);border-radius:14px;padding:20px;border:1px solid var(--border);box-shadow:0 8px 30px rgba(0,0,0,0.6);animation:pop .45s}
+@keyframes pop{from{transform:translateY(8px) scale(.995);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+.card-title{color:var(--primary);font-size:20px;margin-bottom:8px;text-align:center}
+.card-desc{color:var(--muted);font-size:13px;margin-bottom:12px;text-align:center}
+.field{margin-bottom:10px}
+.field input{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--border);background:rgba(8,8,10,0.6);color:#eaf6ff;font-size:15px;outline:none;transition:box-shadow .12s,border-color .12s}
+.field input:focus{border-color:var(--neon);box-shadow:0 0 10px rgba(0,240,255,0.06);transform:translateY(-1px)}
+.btn{width:100%;padding:12px 14px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--primary),var(--secondary));color:#fff;font-weight:600;cursor:pointer;font-size:15px;box-shadow:0 8px 28px rgba(37,117,252,0.07);transition:transform .12s,box-shadow .12s;position:relative;overflow:hidden;animation:pulse 2.2s infinite}
+.btn:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(37,117,252,0.12)}
+@keyframes pulse{0%{box-shadow:0 6px 20px rgba(0,240,255,0.04)}50%{box-shadow:0 14px 36px rgba(0,240,255,0.07)}100%{box-shadow:0 6px 20px rgba(0,240,255,0.04)}}
+.btn-link{background:transparent;color:var(--neon);border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:8px;cursor:pointer}
+.err{color:#ff9b9b;font-weight:600;margin-top:8px;display:none;text-align:center}
+.panel{background:linear-gradient(180deg, rgba(10,10,12,0.46), rgba(5,5,6,0.6));border-radius:12px;padding:12px;width:100%}
+.table-wrap{width:100%;overflow:auto;margin-top:6px}
+table{width:100%;border-collapse:collapse;min-width:520px}
+thead th{text-align:left;padding:10px 12px;font-size:13px;color:#fff;background:rgba(20,20,24,0.6);border-bottom:1px solid var(--border);font-weight:600}
+tbody td{padding:10px 12px;font-size:14px;background:linear-gradient(180deg, rgba(255,255,255,0.008), transparent);border-bottom:1px solid rgba(255,255,255,0.02);position:relative}
+tbody tr:hover td{background:rgba(0,240,255,0.03)}
+tbody tr::after{content:"";position:absolute;width:120px;height:120px;border-radius:999px;left:50%;top:50%;transform:translate(-50%,-50%) scale(0);background:var(--ripple);opacity:0;transition:transform .6s,opacity .9s}
+tbody tr:active::after{transform:translate(-50%,-50%) scale(4);opacity:1;transition:none}
+.cell-input{width:100%;padding:8px 10px;border-radius:8px;border:1px solid var(--border);background:rgba(6,6,8,0.6);color:#eaf6ff;font-size:13px}
+.action-btn{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:8px;cursor:pointer}
+.action-btn:hover{box-shadow:0 8px 24px rgba(0,0,0,0.4)}
+.add-block{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.add-block .small{flex:1 1 48%;min-width:140px}
+.add-block .full{flex:1 1 100%}
+.expiry-view{width:100%;padding:12px}
+.expiry-item{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px;border-radius:8px;margin-bottom:8px;background:rgba(255,255,255,0.01)}
+.expiry-item.expired{background:rgba(220,53,69,0.12);color:#ffdddd;border:1px solid rgba(220,53,69,0.18)}
+.expiry-item .left{font-weight:700;color:#dff3ff}
+.expiry-item .count{font-family:monospace;font-size:14px;color:#bfffe0}
+.toast{position:absolute;left:50%;transform:translateX(-50%);bottom:14px;background:rgba(10,10,12,0.9);border:1px solid var(--border);padding:8px 12px;border-radius:10px;color:#d4ffd9;display:none;box-shadow:0 8px 30px rgba(0,0,0,0.5);z-index:70}
+@media (max-width:420px){.login-card{padding:14px;border-radius:12px}thead th{font-size:12px}tbody td{font-size:13px;padding:8px}.add-block{gap:6px}}
+</style>
+</head>
+<body>
+  <div class="app" role="application" aria-label="Premium Login Admin">
+    <div class="header">
+      <div class="brand" id="uiTitle">Premium Login</div>
+      <div class="right">
+        <div id="onlineIndicator" style="display:none;color:#bfffe0;font-weight:600">● Online</div>
+        <button id="menuBtn" class="menu-btn" aria-label="Menu" title="Menu"><span class="menu-icon"></span></button>
+      </div>
+      <div id="menuDropdown" class="menu-dropdown" aria-hidden="true">
+        <button id="menuHomeBtn">🏠 မူလစာမျက်နှာ <span class="sub">Main screen</span></button>
+        <button id="menuExpiryBtn">⏳ Key ကုန်ဆုံးချိန် <span class="sub">Expiry countdown</span></button>
+      </div>
+    </div>
+
+    <div id="menuOverlay" class="menu-overlay" aria-hidden="true"></div>
+
+    <div class="body">
+      <!-- LOGIN -->
+      <div id="loginScreen" style="width:100%;display:block;">
+        <div class="login-card">
+          <div class="card-title" id="cardTitle">Premium Login</div>
+          <div class="card-desc" id="cardDesc">Welcome to Premium Access.</div>
+          <div class="field"><input id="device_id" placeholder="Device ID"></div>
+          <div class="field"><input id="device_pwd" type="password" placeholder="Password"></div>
+          <button id="loginBtn" class="btn" onclick="doLogin()"><span id="loginLabel">Login</span></button>
+          <div style="display:flex;gap:8px;margin-top:10px;justify-content:center">
+            <button id="copyBtn" class="btn-link">Copy ID</button>
+            <button id="openAdmin" class="btn-link" style="display:none">Open Admin</button>
+          </div>
+          <div id="loginErr" class="err">Invalid Device ID or Password / Expired</div>
+        </div>
+      </div>
+
+      <!-- ADMIN VIEW -->
+      <div id="adminView" style="display:none;width:100%">
+        <div class="panel">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-weight:700;color:#dff3ff">Device Section</div>
+            <div id="saveIndicator" style="font-size:13px;color:#cfe9ff"></div>
+          </div>
+          <div class="table-wrap">
+            <table aria-live="polite">
+              <thead><tr><th>Device ID</th><th>Password</th><th>Expire Date</th><th style="text-align:right">Actions</th></tr></thead>
+              <tbody id="devicesTbody"></tbody>
+            </table>
+          </div>
+          <h3 style="margin-top:8px;color:#dbeeff">➕ Add Device</h3>
+          <div class="add-block">
+            <input id="newDevice" class="small cell-input" placeholder="Device ID">
+            <input id="newPwd" class="small cell-input" placeholder="Password">
+            <input id="newExpire" class="small cell-input" type="date">
+            <button class="btn full" style="flex:1 1 100%;margin-top:6px" onclick="addDevice()">➕ Add Device</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPIRY VIEW -->
+      <div id="expiryView" style="display:none;width:100%">
+        <div class="panel expiry-view">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-weight:700;color:#dff3ff">Key ကုန်ဆုံးချိန် (Expiry)</div>
+            <div><button class="btn-link" onclick="goHome()">← မူလစာမျက်နှာ</button></div>
+          </div>
+          <div id="expiryList"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="toast" class="toast">Saved</div>
+  </div>
+
+<script>
+/* ====== CONFIG ====== */
+/* NOTE: You asked to embed token here — BE CAREFUL (don't publish this file). */
+const GITHUB_TOKEN = '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';
+const REPO = 'ppsspphero7661-ux/Login-';
+const PATH = 'key.json';
+const RAW_URL = `https://raw.githubusercontent.com/${REPO}/main/${PATH}`;
+const API_BASE = `https://api.github.com/repos/${REPO}/contents/${PATH}`;
+
+/* ====== STATE ====== */
+let configData = null;
+let currentSha = '';
+let devices = [];
+let saveTimer = null;
+let expiryInterval = null;
+let currentView = 'login';
+
+/* ====== UI REFS ====== */
+const menuBtn = document.getElementById('menuBtn');
+const menuDropdown = document.getElementById('menuDropdown');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuHomeBtn = document.getElementById('menuHomeBtn');
+const menuExpiryBtn = document.getElementById('menuExpiryBtn');
+const loginErr = document.getElementById('loginErr');
+const loginScreen = document.getElementById('loginScreen');
+const adminView = document.getElementById('adminView');
+const expiryView = document.getElementById('expiryView');
+const devicesTbody = document.getElementById('devicesTbody');
+const expiryList = document.getElementById('expiryList');
+const toast = document.getElementById('toast');
+const saveIndicator = document.getElementById('saveIndicator');
+
+/* ====== HELPERS ====== */
+function showToast(msg, ms=1400){ toast.textContent = msg; toast.style.display='block'; clearTimeout(toast._t); toast._t = setTimeout(()=> toast.style.display='none', ms); }
+function setSaving(on, text='Saving...'){ saveIndicator.innerHTML = on ? `⏳ ${text}` : ''; }
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+/* ====== BOOT ====== */
+window.addEventListener('DOMContentLoaded', async ()=>{
+  // wire up menu (hidden until admin)
+  menuBtn.style.display = 'none';
+  menuBtn.addEventListener('click', ()=>{
+    const open = menuBtn.classList.toggle('open');
+    if(open){ menuDropdown.classList.add('open'); menuOverlay.classList.add('visible'); menuDropdown.setAttribute('aria-hidden','false'); menuOverlay.setAttribute('aria-hidden','false'); }
+    else { menuDropdown.classList.remove('open'); menuOverlay.classList.remove('visible'); menuDropdown.setAttribute('aria-hidden','true'); menuOverlay.setAttribute('aria-hidden','true'); }
+  });
+  menuOverlay.addEventListener('click', ()=>{ menuBtn.classList.remove('open'); menuDropdown.classList.remove('open'); menuOverlay.classList.remove('visible'); menuDropdown.setAttribute('aria-hidden','true'); menuOverlay.setAttribute('aria-hidden','true'); });
+  menuHomeBtn.addEventListener('click', ()=>{ closeMenu(); goHome(); });
+  menuExpiryBtn.addEventListener('click', ()=>{ closeMenu(); showExpiry(); });
+
+  // Enter key login
+  ['device_id','device_pwd'].forEach(id=>{
+    const el = document.getElementById(id);
+    el && el.addEventListener('keydown', (e)=>{ if(e.key === 'Enter'){ e.preventDefault(); doLogin(); }});
+  });
+
+  // copy button
+  document.getElementById('copyBtn').addEventListener('click', ()=>{
+    const id = document.getElementById('device_id').value.trim();
+    if(!id){ showToast('No ID to copy'); return; }
+    navigator.clipboard?.writeText(id).then(()=> showToast('Copied ID')).catch(()=> showToast('Copy failed'));
+  });
+
+  await loadConfig();
+});
+
+/* close menu */
+function closeMenu(){ menuBtn.classList.remove('open'); menuDropdown.classList.remove('open'); menuOverlay.classList.remove('visible'); menuDropdown.setAttribute('aria-hidden','true'); menuOverlay.setAttribute('aria-hidden','true'); }
+
+/* ====== LOAD CONFIG ====== */
+async function loadConfig(){
+  setSaving(true,'Loading...');
+  try{
+    // If token present, prefer API GET (so we can get sha)
+    if(GITHUB_TOKEN){
+      const res = await fetch(API_BASE, { headers: { 'Authorization': 'token ' + GITHUB_TOKEN }});
+      if(!res.ok) throw new Error('API GET failed: '+res.status);
+      const meta = await res.json();
+      currentSha = meta.sha || '';
+      const content = atob(meta.content.replace(/\n/g,''));
+      configData = JSON.parse(content);
+    } else {
+      // fallback to raw
+      const r = await fetch(RAW_URL, { cache:'no-store' });
+      if(!r.ok) throw new Error('Raw GET failed');
+      configData = await r.json();
+    }
+    if(!Array.isArray(configData.device_section)) configData.device_section = [];
+    devices = configData.device_section.slice();
+    // update UI strings
+    document.getElementById('uiTitle') && (document.getElementById('uiTitle').textContent = configData.title || 'Premium Login');
+    document.getElementById('cardTitle') && (document.getElementById('cardTitle').textContent = configData.title || 'Premium Login');
+    document.getElementById('cardDesc') && (document.getElementById('cardDesc').textContent = (Array.isArray(configData.descriptions) && configData.descriptions[0]) || '');
+    document.getElementById('loginLabel') && (document.getElementById('loginLabel').textContent = configData.button_login || 'Login');
+    document.getElementById('copyBtn') && (document.getElementById('copyBtn').textContent = configData.button_copy || 'Copy ID');
+    if(configData.admin_url){ document.getElementById('openAdmin').style.display='inline-block'; document.getElementById('openAdmin').onclick = ()=> window.open(configData.admin_url,'_blank'); }
+    document.getElementById('onlineIndicator') && (document.getElementById('onlineIndicator').style.display = configData.online_enable ? 'inline-block' : 'none');
+  }catch(err){
+    console.error('loadConfig error', err);
+    // try localStorage fallback
+    const local = localStorage.getItem('local_key_json');
+    if(local){
+      try{ configData = JSON.parse(local); devices = configData.device_section || []; showToast('Loaded local copy'); }
+      catch(e){ configData = { device_section:[] }; devices = []; showToast('Using empty demo'); }
+    } else {
+      // demo defaults
+      configData = {
+        dialog_enable:true, online_enable:true, title:'Premium Login',
+        descriptions:['Welcome to Premium Access.'],
+        button_login:'Login', button_admin:'Admin', button_copy:'Copy ID', admin_url:'',
+        device_section:[
+          { device_id:'1234567890abcdef', password:'1122', expire_date:'2025-12-31' },
+          { device_id:'abcdef9876543210', password:'3344', expire_date:'2026-01-15' },
+          { device_id:'offline-device', password:'1234', expire_date:'2026-01-01' }
+        ]
+      };
+      devices = configData.device_section.slice();
+      showToast('Using demo data');
+    }
+  } finally { setSaving(false); }
+}
+
+/* ====== LOGIN (fixed Problem/Pro) ====== */
+function doLogin(){
+  if(configData && configData.dialog_enable === false){
+    loginErr.textContent = 'Login dialog disabled.'; loginErr.style.display='block'; setTimeout(()=> loginErr.style.display='none',1600); return;
+  }
+  const id = document.getElementById('device_id').value.trim();
+  const pwd = document.getElementById('device_pwd').value.trim();
+  if(!id || !pwd){ loginErr.textContent='Fill both fields'; loginErr.style.display='block'; setTimeout(()=> loginErr.style.display='none',1600); return; }
+  if(id !== 'Problem' || pwd !== 'Pro'){ loginErr.textContent='Invalid credentials (use Problem / Pro)'; loginErr.style.display='block'; setTimeout(()=> loginErr.style.display='none',1600); return; }
+  // success
+  loginScreen.style.display='none';
+  adminView.style.display='block';
+  currentView = 'admin';
+  menuBtn.classList.add('show'); // show menu
+  renderDevicesTable();
+  showToast('✅ Logged in as Problem',1200);
+}
+
+/* ====== RENDER TABLE ====== */
+function renderDevicesTable(){
+  devicesTbody.innerHTML = '';
+  devices.forEach((d, i) => {
+    const tr = document.createElement('tr');
+    const tdId = document.createElement('td'); const inId = document.createElement('input');
+    inId.className = 'cell-input'; inId.value = d.device_id || ''; inId.onchange = e => updateField(i, 'device_id', e.target.value); tdId.appendChild(inId);
+    const tdPwd = document.createElement('td'); const inPwd = document.createElement('input');
+    inPwd.className = 'cell-input'; inPwd.value = d.password || ''; inPwd.onchange = e => updateField(i, 'password', e.target.value); tdPwd.appendChild(inPwd);
+    const tdExp = document.createElement('td'); const inExp = document.createElement('input');
+    inExp.type = 'date'; inExp.className = 'cell-input'; inExp.value = d.expire_date || ''; inExp.onchange = e => updateField(i, 'expire_date', e.target.value); tdExp.appendChild(inExp);
+    const tdAct = document.createElement('td'); tdAct.style.textAlign = 'right';
+    const delBtn = document.createElement('button'); delBtn.className = 'action-btn'; delBtn.textContent = '🗑 Delete';
+    delBtn.onclick = () => { if(confirm('Delete this device?')) { deleteDevice(i); } };
+    tdAct.appendChild(delBtn);
+    tr.appendChild(tdId); tr.appendChild(tdPwd); tr.appendChild(tdExp); tr.appendChild(tdAct);
+    devicesTbody.appendChild(tr);
+  });
+}
+
+/* ====== CRUD + SAVE ====== */
+function updateField(idx, field, val){ if(!devices[idx]) return; devices[idx][field] = val; debounceSave(); if(currentView==='expiry') renderExpiryList(); }
+function deleteDevice(idx){ devices.splice(idx,1); renderDevicesTable(); saveToRemote(); if(currentView==='expiry') renderExpiryList(); }
+function addDevice(){
+  const id = document.getElementById('newDevice').value.trim();
+  const pwd = document.getElementById('newPwd').value.trim();
+  const exp = document.getElementById('newExpire').value || '';
+  if(!id || !pwd){ alert('Please fill Device ID and Password'); return; }
+  devices.push({ device_id:id, password:pwd, expire_date:exp });
+  document.getElementById('newDevice').value=''; document.getElementById('newPwd').value=''; document.getElementById('newExpire').value='';
+  renderDevicesTable(); saveToRemote(); if(currentView==='expiry') renderExpiryList();
+}
+function debounceSave(){ if(saveTimer) clearTimeout(saveTimer); saveTimer = setTimeout(()=> saveToRemote(), 700); }
+
+/* Save to GitHub (PUT) if token, else localStorage */
+async function saveToRemote(){
+  setSaving(true,'Saving...');
+  if(!configData) configData = {};
+  configData.device_section = devices.slice();
+  if(GITHUB_TOKEN){
+    try{
+      const contentB64 = btoa(JSON.stringify(configData, null, 2));
+      const body = { message: 'Update key.json via Admin Panel', content: contentB64 };
+      if(currentSha) body.sha = currentSha;
+      const res = await fetch(API_BASE, {
+        method: 'PUT',
+        headers: { 'Authorization': 'token ' + GITHUB_TOKEN, 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      if(!res.ok){
+        const txt = await res.text();
+        console.error('GitHub save error', res.status, txt);
+        alert('Failed to save to GitHub: ' + res.status);
+        setSaving(false);
+        return;
+      }
+      const data = await res.json();
+      if(data && data.content && data.content.sha) currentSha = data.content.sha;
+      // After save, reload authoritative copy from GitHub to avoid stale data
+      await sleep(300);
+      await loadConfig();
+      renderDevicesTable();
+      renderExpiryList();
+      showToast('✅ Saved to GitHub & synced');
+    }catch(e){
+      console.error('saveToGitHub error', e);
+      alert('Error saving to GitHub (see console)');
+    }finally{ setSaving(false); }
+  } else {
+    try{
+      localStorage.setItem('local_key_json', JSON.stringify(configData, null, 2));
+      localStorage.setItem('local_key_sha', Date.now().toString());
+      currentSha = localStorage.getItem('local_key_sha');
+      await loadConfig();
+      renderDevicesTable();
+      renderExpiryList();
+      showToast('✅ Saved locally (no token)');
+    }catch(e){ console.error('local save error', e); alert('Failed to save locally'); } finally { setSaving(false); }
+  }
+}
+
+/* ====== EXPIRY VIEW ====== */
+function showExpiry(){ currentView='expiry'; adminView.style.display='none'; loginScreen.style.display='none'; expiryView.style.display='block'; renderExpiryList(); startExpiryTimers(); }
+function goHome(){ currentView='admin'; expiryView.style.display='none'; loginScreen.style.display='none'; adminView.style.display='block'; stopExpiryTimers(); renderDevicesTable(); }
+
+function renderExpiryList(){
+  expiryList.innerHTML = '';
+  if(!devices || devices.length===0){ expiryList.innerHTML = '<div style="color:#bbb">No keys</div>'; return; }
+  devices.forEach((d,i)=>{
+    const div = document.createElement('div'); div.className='expiry-item'; div.dataset.idx = i;
+    const left = document.createElement('div'); left.className='left'; left.textContent = d.device_id || '(no id)';
+    const right = document.createElement('div'); right.className='count';
+    const expText = computeCountdownText(d.expire_date);
+    right.innerHTML = expText.html;
+    if(expText.expired) div.classList.add('expired');
+    div.appendChild(left); div.appendChild(right);
+    expiryList.appendChild(div);
+  });
+}
+function computeCountdownText(dateStr){
+  if(!dateStr) return { html: '<span style="color:#ffcc66">No expiry</span>', expired:false };
+  const target = Date.parse(dateStr + 'T23:59:59');
+  if(isNaN(target)) return { html: '<span style="color:#ffcc66">Invalid date</span>', expired:false };
+  const diff = target - Date.now();
+  if(diff <= 0) return { html: '<span style="color:#ff5a5a">Expired</span>', expired:true };
+  const sec = Math.floor(diff/1000);
+  const days = Math.floor(sec/86400);
+  const h = Math.floor((sec % 86400)/3600);
+  const m = Math.floor((sec % 3600)/60);
+  const s = sec % 60;
+  const hh = String(h).padStart(2,'0'), mm=String(m).padStart(2,'0'), ss=String(s).padStart(2,'0');
+  let html = ''; if(days>0) html = `<span>${days}d ${hh}:${mm}:${ss}</span>`; else html = `<span>${hh}:${mm}:${ss}</span>`;
+  return { html, expired:false };
+}
+function startExpiryTimers(){ stopExpiryTimers(); expiryInterval = setInterval(()=>{ const items = expiryList.querySelectorAll('.expiry-item'); items.forEach(item=>{ const idx = parseInt(item.dataset.idx); const d = devices[idx]; if(!d) return; const result = computeCountdownText(d.expire_date); item.querySelector('.count').innerHTML = result.html; if(result.expired) item.classList.add('expired'); else item.classList.remove('expired'); }); }, 1000); }
+function stopExpiryTimers(){ if(expiryInterval){ clearInterval(expiryInterval); expiryInterval = null; } }
+
+/* expose debug */
+window._debug = { getConfig: () => configData, devices, saveToRemote, loadConfig, renderExpiryList };
+</script>
+</body>
+</html>
